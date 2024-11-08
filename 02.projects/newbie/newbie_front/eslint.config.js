@@ -10,7 +10,10 @@ export default [
     files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        jest: true, // jest 환경 추가
+      },
       parserOptions: {
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
@@ -19,7 +22,7 @@ export default [
     },
     settings: { react: { version: '18.3' } },
     plugins: {
-      react,
+      'react': react,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
     },
