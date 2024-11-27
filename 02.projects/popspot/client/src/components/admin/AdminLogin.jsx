@@ -1,35 +1,44 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
-const LoginContainer = styled.div`
-  width: 100%;
-  max-width: 400px;
-  margin: 100px auto;
-  padding: 20px;
+const LoginWrapper = styled.div`
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f5f5f5;
 `;
 
 const LoginForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+    width: 400px;
+    padding: 40px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const Input = styled.input`
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 `;
 
 const Button = styled.button`
-  padding: 12px;
-  background: #333;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+    width: 100%;
+    padding: 12px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 `;
 
-const AdminLogin = ({ onLogin }) => {
+const AdminLogin = () => {
+    const navigate = useNavigate();
     const [credentials, setCredentials] = useState({
         id: '',
         password: ''
@@ -38,15 +47,17 @@ const AdminLogin = ({ onLogin }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (credentials.id === 'administrator' && credentials.password === '1234') {
-            onLogin(true);
+            localStorage.setItem('isAdmin', 'true');
+            navigate('/admin/popups');  // 수정된 경로
         } else {
-            alert('로그인 정보가 올바르지 않습니다.');
+            alert('로그인 실패');
         }
     };
 
     return (
-        <LoginContainer>
+        <LoginWrapper>
             <LoginForm onSubmit={handleSubmit}>
+                <h2>관리자 로그인</h2>
                 <Input
                     type="text"
                     placeholder="아이디"
@@ -61,7 +72,7 @@ const AdminLogin = ({ onLogin }) => {
                 />
                 <Button type="submit">로그인</Button>
             </LoginForm>
-        </LoginContainer>
+        </LoginWrapper>
     );
 };
 

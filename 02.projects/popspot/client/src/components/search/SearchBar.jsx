@@ -1,16 +1,18 @@
+// src/components/search/SearchBar.jsx
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
 const SearchContainer = styled.div`
     display: flex;
-    gap: 8px;
+    margin-left: auto;  // 우측 정렬 유지
 `;
 
 const SearchInput = styled.input`
     padding: 8px 12px;
     border: 1px solid #ddd;
-    border-radius: 4px;
-    flex: 1;
+    border-radius: 4px 0 0 4px;
+    width: 200px;
+    border-right: none;
 `;
 
 const SearchButton = styled.button`
@@ -18,7 +20,7 @@ const SearchButton = styled.button`
     background: #333;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 0 4px 4px 0;
     cursor: pointer;
 `;
 

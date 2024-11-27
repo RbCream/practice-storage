@@ -1,21 +1,20 @@
+// src/utils/api.js
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:4090/api';
+const api = axios.create({
+    baseURL: 'http://localhost:4090/api'
+});
 
-export const api = {
-    getPopups: async (page = 1, filter = 'latest') => {
-        const response = await axios.get(`${BASE_URL}/popups`, {
-            params: { page, filter }
-        });
-        return response.data;
-    },
+export const popupAPI = {
+    getPopups: (page = 1, filter = 'latest', search = '') =>
+        api.get('/popups', { params: { page, filter, search } }),
 
-    getPopupById: async (id) => {
-        const response = await axios.get(`${BASE_URL}/popups/${id}`);
-        return response.data;
-    },
-
-    checkAdmin: async (credentials) => {
-        return credentials.id === 'administrator' && credentials.password === '1234';
-    }
+    createPopup: (formData) =>
+        api.post('/popups', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
 };
+
+export default api;

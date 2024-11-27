@@ -1,3 +1,4 @@
+// src/styles/GlobalStyle.js
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
@@ -9,7 +10,7 @@ const GlobalStyle = createGlobalStyle`
 
     body {
         font-family: 'Noto Sans KR', sans-serif;
-        background-color: #f8f9fa;
+        line-height: 1.5;
     }
 
     a {
@@ -19,6 +20,8 @@ const GlobalStyle = createGlobalStyle`
 
     button {
         cursor: pointer;
+        border: none;
+        background: none;
     }
 `;
 

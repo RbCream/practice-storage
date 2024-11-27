@@ -1,7 +1,8 @@
-// utils/responseHandler.js
-const successResponse = (res, data, status = 200) => {
-    return res.status(status).json({
+// src/utils/responseHandler.js
+const successResponse = (res, data, message = 'Success') => {
+    return res.status(200).json({
         success: true,
+        message,
         data
     });
 };
@@ -9,7 +10,8 @@ const successResponse = (res, data, status = 200) => {
 const errorResponse = (res, error, status = 500) => {
     return res.status(status).json({
         success: false,
-        error: error.message || error
+        message: error.message || 'Internal server error',
+        error: process.env.NODE_ENV === 'development' ? error : undefined
     });
 };
 

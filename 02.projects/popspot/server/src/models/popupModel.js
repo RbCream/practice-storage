@@ -1,20 +1,16 @@
-const db = require('../../config/database');
+// src/models/popupModel.js
+const pool = require('../../config/database');
 
 const PopupModel = {
-    getAll: async (page = 1, filter = 'latest', search = '') => {
-        const limit = 6;
+    findAll: async (page, limit, filter, search) => {
         const offset = (page - 1) * limit;
-
-        let query = `
-            SELECT * FROM popups 
-            WHERE is_deleted = false
-        `;
+        let query = `SELECT * FROM popups WHERE is_deleted = false`;
 
         if (search) {
-            query += ` AND (title LIKE ? OR location LIKE ?)`;
+            query += ` AND (title LIKE ? OR content_type LIKE ? OR location LIKE ?)`;
         }
 
-        switch (filter) {
+        switch(filter) {
             case 'views':
                 query += ` ORDER BY views DESC`;
                 break;
@@ -26,46 +22,23 @@ const PopupModel = {
         }
 
         query += ` LIMIT ? OFFSET ?`;
-
-        const [rows] = await db.query(query, [
-            `%${search}%`,
-            `%${search}%`,
-            limit,
-            offset
-        ]);
-        return rows;
+        return await pool.query(query, [`%${search}%`, `%${search}%`, `%${search}%`, limit, offset]);
     },
 
-    getById: async (id) => {
-        const [rows] = await db.query(
-            'SELECT * FROM popups WHERE id = ? AND is_deleted = false',
-            [id]
-        );
-        return rows[0];
-    },
-
-    create: async (data) => {
-        const [result] = await db.query(
-            'INSERT INTO popups SET ?',
-            [data]
+    create: async (popupData) => {
+        const [result] = await pool.query(
+            `INSERT INTO popups SET ?`,
+            [popupData]
         );
         return result.insertId;
     },
 
-    updateStatus: async (id, isActive) => {
-        const [result] = await db.query(
-            'UPDATE popups SET is_active = ? WHERE id = ?',
-            [isActive, id]
+    addDetailImages: async (popupId, imageUrls) => {
+        const values = imageUrls.map(url => [popupId, url]);
+        return await pool.query(
+            `INSERT INTO popup_detail_images (popup_id, image_url) VALUES ?`,
+            [values]
         );
-        return result.affectedRows > 0;
-    },
-
-    delete: async (id) => {
-        const [result] = await db.query(
-            'UPDATE popups SET is_deleted = true WHERE id = ?',
-            [id]
-        );
-        return result.affectedRows > 0;
     }
 };
 
