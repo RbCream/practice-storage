@@ -1,11 +1,10 @@
-// src/services/popupService.js
 const pool = require('../../config/database');
 
 const popupService = {
     getPopups: async (page = 1, filter = 'latest', search = '') => {
         const limit = 8;
         const offset = (page - 1) * limit;
-        const params = [];  // 쿼리 파라미터 배열 추가
+        const params = [];
 
         let query = `SELECT * FROM popups WHERE is_deleted = false`;
 
@@ -26,34 +25,34 @@ const popupService = {
         }
 
         query += ` LIMIT ? OFFSET ?`;
-        params.push(limit, offset);  // limit와 offset 추가
+        params.push(limit, offset);
 
-        const [rows] = await pool.query(query, params);  // 파라미터 배열 사용
+        const [rows] = await pool.query(query, params);
         return rows;
     },
 
     createPopup: async (popupData, mainImagePath, detailImages) => {
         const [result] = await pool.query(
             `INSERT INTO popups (
-                title, content_type, organizer, location, 
-                start_date, end_date, operation_hours, description, 
-                main_image, views
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                title, content_type, organizer, location,
+                start_date, end_date, operation_hours, description,
+                main_image, views, created_at, is_deleted
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), false)`,
             [
                 popupData.title,
-                popupData.contentType,
+                popupData.content_type,
                 popupData.organizer,
                 popupData.location,
-                popupData.startDate,
-                popupData.endDate,
-                popupData.operationHours,
+                popupData.start_date,
+                popupData.end_date,
+                popupData.operation_hours,
                 popupData.description,
                 mainImagePath,
-                0  // 초기 조회수 추가
+                0
             ]
         );
 
-        if (detailImages && detailImages.length > 0) {
+        if (detailImages?.length > 0) {
             const detailImageValues = detailImages.map(file => [result.insertId, file.path]);
             await pool.query(
                 `INSERT INTO popup_detail_images (popup_id, image_url) VALUES ?`,
@@ -62,6 +61,37 @@ const popupService = {
         }
 
         return result.insertId;
+    },
+
+    updatePopup: async (id, popupData, mainImagePath) => {
+        const [result] = await pool.query(
+            `UPDATE popups SET
+                               title = ?, content_type = ?, organizer = ?, location = ?,
+                               start_date = ?, end_date = ?, operation_hours = ?, description = ?,
+                               main_image = COALESCE(?, main_image)
+             WHERE id = ? AND is_deleted = false`,
+            [
+                popupData.title,
+                popupData.content_type,
+                popupData.organizer,
+                popupData.location,
+                popupData.start_date,
+                popupData.end_date,
+                popupData.operation_hours,
+                popupData.description,
+                mainImagePath,
+                id
+            ]
+        );
+        return result.affectedRows > 0;
+    },
+
+    deletePopup: async (id) => {
+        const [result] = await pool.query(
+            `UPDATE popups SET is_deleted = true WHERE id = ?`,
+            [id]
+        );
+        return result.affectedRows > 0;
     }
 };
 

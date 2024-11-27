@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const FormWrapper = styled.div`
@@ -84,7 +84,7 @@ const Button = styled.button`
     }
 `;
 
-const AdminPopupForm = ({ onSubmit }) => {
+const AdminPopupForm = ({ onSubmit, initialData }) => {
     const [formData, setFormData] = useState({
         title: '',
         contentType: '',
@@ -98,11 +98,28 @@ const AdminPopupForm = ({ onSubmit }) => {
         detailImages: []
     });
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        if (initialData) {
+            setFormData({
+                title: initialData.title || '',
+                contentType: initialData.content_type || '',
+                organizer: initialData.organizer || '',
+                location: initialData.location || '',
+                startDate: initialData.start_date?.split('T')[0] || '',
+                endDate: initialData.end_date?.split('T')[0] || '',
+                operationHours: initialData.operation_hours || '',
+                description: initialData.description || '',
+                mainImage: null,
+                detailImages: []
+            });
+        }
+    }, [initialData]);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const formDataToSend = new FormData();
 
-        // 텍스트 데이터 추가 - 서버 API 규격에 맞게 수정
+        // 텍스트 데이터 추가
         formDataToSend.append('title', formData.title);
         formDataToSend.append('content_type', formData.contentType);
         formDataToSend.append('organizer', formData.organizer);
@@ -117,7 +134,18 @@ const AdminPopupForm = ({ onSubmit }) => {
             formDataToSend.append('main_image', formData.mainImage);
         }
 
-        onSubmit(formDataToSend);
+        if (formData.detailImages?.length > 0) {
+            formData.detailImages.forEach((image) => {
+                formDataToSend.append('detail_images', image);
+            });
+        }
+
+        try {
+            await onSubmit(formDataToSend);
+        } catch (error) {
+            console.error('폼 제출 실패:', error);
+            alert('저장에 실패했습니다.');
+        }
     };
 
     const handleChange = (e) => {
@@ -228,7 +256,7 @@ const AdminPopupForm = ({ onSubmit }) => {
                                 ...prev,
                                 mainImage: e.target.files[0]
                             }))}
-                            required
+                            required={!initialData}
                         />
                         <ImageHelp>* 목록에 표시될 대표 이미지입니다.</ImageHelp>
                     </InputGroup>
@@ -248,7 +276,9 @@ const AdminPopupForm = ({ onSubmit }) => {
                     </InputGroup>
                 </ImageUploadSection>
 
-                <Button type="submit">등록하기</Button>
+                <Button type="submit">
+                    {initialData ? '수정하기' : '등록하기'}
+                </Button>
             </Form>
         </FormWrapper>
     );

@@ -49,26 +49,17 @@ export const usePopup = () => {
 
     const updatePopup = async (id, formData) => {
         try {
-            setLoading(true);
             const response = await axios.put(`http://localhost:4090/api/popups/${id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
             if (response.data.success) {
-                setPopups(prev => ({
-                    ...prev,
-                    data: prev.data.map(popup =>
-                        popup.id === id ? response.data.data : popup
-                    )
-                }));
                 return response.data.data;
             }
-        } catch (err) {
-            setError(err.message);
-            throw err;
-        } finally {
-            setLoading(false);
+            throw new Error(response.data.message || '수정 실패');
+        } catch (error) {
+            throw error;
         }
     };
 

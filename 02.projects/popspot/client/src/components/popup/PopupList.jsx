@@ -19,7 +19,7 @@ const EmptyMessage = styled.div`
     color: #666;
 `;
 
-const PopupList = ({ popups }) => {
+const PopupList = ({ popups, onEdit, onDelete }) => {
     const [selectedPopup, setSelectedPopup] = useState(null);
     const emptyCards = Array(8).fill(null);
 
@@ -52,6 +52,8 @@ const PopupList = ({ popups }) => {
                     <PopupCard
                         key={popup.id}
                         popup={popup}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
                         onCardClick={handleCardClick}
                     />
                 ))}

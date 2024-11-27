@@ -103,7 +103,7 @@ const PopupModal = ({ popup, onClose }) => {
                     src={`http://localhost:4090${main_image}`}
                     alt={title}
                     onError={(e) => {
-                        e.target.src = "/placeholder-image.jpg";
+                        e.target.src = "uploads/placeholder-image.jpg";
                         e.target.alt = "이미지를 불러올 수 없습니다";
                     }}
                 />

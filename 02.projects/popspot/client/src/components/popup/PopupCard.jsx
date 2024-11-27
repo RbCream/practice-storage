@@ -21,8 +21,8 @@ const Image = styled.img`
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;  // 추가
-    margin: 0 auto;  // 추가
+    display: block;
+    margin: 0 auto;
 `;
 
 const Location = styled.div`
@@ -64,6 +64,7 @@ const Type = styled.p`
     min-height: 1rem;
     background-color: ${props => props.empty ? '#f5f5f5' : 'transparent'};
 `;
+
 const AdminButtons = styled.div`
     display: flex;
     gap: 8px;
@@ -94,13 +95,46 @@ const AdminButton = styled.button`
     }
 `;
 
-const PopupCard = ({ popup, onEdit, onDelete }) => {
+const PopupCard = ({ popup, onEdit, onDelete, onCardClick }) => {
     const [imageError, setImageError] = React.useState(false);
     const location = useLocation();
     const isAdminPage = location.pathname === '/admin';
 
+    const handleClick = () => {
+        if (popup && !isAdminPage && onCardClick) {
+            onCardClick(popup);
+        }
+    };
+
+    const handleEdit = (e) => {
+        e.stopPropagation();
+        console.log('Edit clicked:', popup);  // 디버깅용
+        onEdit && onEdit(popup);
+    };
+
+    const handleDelete = (e) => {
+        e.stopPropagation();
+        console.log('Delete clicked:', popup.id);  // 디버깅용
+        if (window.confirm('정말 삭제하시겠습니까?')) {
+            onDelete && onDelete(popup.id);
+        }
+    };
+
+    if (!popup) {
+        return (
+            <Card>
+                <ImageWrapper />
+                <Content>
+                    <Title empty />
+                    <Type empty />
+                    <Type empty />
+                </Content>
+            </Card>
+        );
+    }
+
     return (
-        <Card>
+        <Card onClick={handleClick}>
             <ImageWrapper>
                 {!imageError ? (
                     <Image
@@ -110,7 +144,7 @@ const PopupCard = ({ popup, onEdit, onDelete }) => {
                     />
                 ) : (
                     <Image
-                        src="/placeholder-image.jpg"
+                        src="/uploads/placeholder-image.jpg"
                         alt="이미지를 불러올 수 없습니다"
                     />
                 )}
